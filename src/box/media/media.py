@@ -29,7 +29,7 @@ def list_media_folder(config: MediaConfig, media_type: MediaType):
 
     try:
         selected_dir = media_dirs[int(selected_dir_idx) - 1]
-    except IndexError:
+    except (IndexError, ValueError):
         creating_dir = console.input(
             "[cyan]Directory does not exist, create it? y/n (y): [/cyan]"
         )
@@ -56,7 +56,7 @@ def place_into_media_folder(
 
     try:
         inner_dir = dirs[int(inner_dir_idx) - 1]
-    except IndexError:
+    except (IndexError, ValueError):
         inner_dir = console.input("[cyan]Enter inner directory name: [/cyan]")
 
     os.makedirs(
