@@ -16,6 +16,8 @@ def move_to_path(
     source_path = os.path.join(config["download_path"], selected_file)
     destination_path = os.path.join(config[media_type + "_path"], selected_dir)
 
+    print(f"Moving {source_path} to {destination_path}")
+
     return execute_command(
         f"sudo mv {source_path} {destination_path}", shell=Shell.BASH
     )
