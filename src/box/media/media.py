@@ -25,11 +25,12 @@ EXTENSIONS = [
 def move_to_path(
     config: MediaConfig, media_type: MediaType, selected_dir: str, selected_file: str
 ):
+    _, extension = os.path.splitext(selected_file)
     source_path = shlex.quote(os.path.join(config["download_path"], selected_file))
 
     print("Source path is: ", source_path)
 
-    if os.path.isdir(source_path):
+    if not extension or extension not in EXTENSIONS:
         print("Is a dir.")
 
         for file in os.listdir(source_path):
