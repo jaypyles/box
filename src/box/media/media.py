@@ -16,10 +16,13 @@ def move_to_path(
     source_path = os.path.join(config["download_path"], selected_file)
     destination_path = os.path.join(config[media_type + "_path"], selected_dir)
 
-    print(f'Moving "{source_path}" to "{destination_path}"')
+    source_path = shlex.quote(source_path)
+    destination_path = shlex.quote(destination_path)
+
+    print(f"Moving {source_path} to {destination_path}")
 
     return execute_command(
-        f'sudo mv "{source_path}" "{destination_path}"', shell=Shell.BASH
+        f"sudo mv {source_path} {destination_path}", shell=Shell.BASH
     )
 
 
@@ -42,6 +45,7 @@ def list_media_folder(config: MediaConfig, media_type: MediaType):
         print(f"[cyan][{idx + 1}] {dir}[/cyan]")
 
     selected_dir_idx = console.input("[cyan]Select directory to move file to: [/cyan]")
+    selected_dir = None
 
     try:
         selected_dir = media_dirs[int(selected_dir_idx) - 1]
@@ -51,14 +55,16 @@ def list_media_folder(config: MediaConfig, media_type: MediaType):
         )
 
         if creating_dir == "y":
-            selected_dir = console.input("[cyan]Enter directory name: [/cyan]")
             os.makedirs(
-                f"{config[media_type + '_path']}/{selected_dir}",
+                f"{config[media_type + '_path']}/{selected_dir_idx}",
                 exist_ok=True,
             )
 
         else:
             return None
+
+    if not selected_dir:
+        return selected_dir_idx
 
     return selected_dir
 
