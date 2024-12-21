@@ -69,19 +69,18 @@ def place_into_media_folder(
 
     print("Inner Dir: ", inner_dir)
 
-    # Escape paths
-    source_path = shlex.quote(os.path.join(config["download_path"], selected_file))
-    destination_path = shlex.quote(
-        os.path.join(config[media_type + "_path"], selected_dir, inner_dir)
+    # Escape paths and quote them
+    source_path = os.path.join(config["download_path"], selected_file)
+    destination_path = os.path.join(
+        config[media_type + "_path"], selected_dir, inner_dir
     )
 
     print("Source Path: ", source_path)
     print("Destination Path: ", destination_path)
 
-    # Execute command
-    out, err = execute_command(
-        f"sudo mv {source_path} {destination_path}", shell=Shell.BASH
-    )
+    # Execute command with quoted paths
+    command = f'sudo mv "{source_path}" "{destination_path}"'
+    out, err = execute_command(command, shell=Shell.BASH)
     print(out)
     print(err)
 
