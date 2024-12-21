@@ -10,11 +10,20 @@ from box.utils.command.utils import Shell
 console = Console()
 
 
+def move_to_path(
+    config: MediaConfig, media_type: MediaType, selected_dir: str, selected_file: str
+):
+    source_path = os.path.join(config["download_path"], selected_file)
+    destination_path = os.path.join(config[media_type + "_path"], selected_dir)
+
+    _ = execute_command(f"sudo mv {source_path} {destination_path}", shell=Shell.BASH)
+
+
 def list_downloaded_files(config: MediaConfig):
     downloaded_files = os.listdir(config["download_path"])
 
     for idx, file in enumerate(downloaded_files):
-        print(f"[cyan][file] {idx + 1} {file} [/cyan]")
+        print(f"[cyan][{idx + 1}] {file}[/cyan]")
 
     selected_file_idx = console.input("Select file to move: ")
     selected_file = downloaded_files[int(selected_file_idx) - 1]
@@ -67,22 +76,10 @@ def place_into_media_folder(
     else:
         inner_dir = dirs[int(inner_dir_idx) - 1]
 
-    print("Inner Dir: ", inner_dir)
+    if inner_dir:
+        selected_dir = f"{selected_dir}/{inner_dir}"
 
-    # Escape paths and quote them
-    source_path = os.path.join(config["download_path"], selected_file)
-    destination_path = os.path.join(
-        config[media_type + "_path"], selected_dir, inner_dir
-    )
-
-    print("Source Path: ", source_path)
-    print("Destination Path: ", destination_path)
-
-    # Execute command with quoted paths
-    command = f'sudo mv "{source_path}" "{destination_path}"'
-    out, err = execute_command(command, shell=Shell.BASH)
-    print(out)
-    print(err)
+    move_to_path(config, media_type, selected_dir, selected_file)
 
 
 def move_download_to_media(
@@ -94,6 +91,10 @@ def move_download_to_media(
     selected_dir = list_media_folder(config, media_type)
 
     if selected_dir is None:
+        return
+
+    if media_type == "movie":
+        move_to_path(config, media_type, selected_dir, selected_file)
         return
 
     place_into_media_folder(config, media_type, selected_dir, selected_file)
