@@ -75,6 +75,9 @@ def place_into_media_folder(
         os.path.join(config[media_type + "_path"], selected_dir, inner_dir)
     )
 
+    print("Source Path: ", source_path)
+    print("Destination Path: ", destination_path)
+
     # Execute command
     out, err = execute_command(
         f"sudo mv {source_path} {destination_path}", shell=Shell.BASH
