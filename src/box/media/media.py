@@ -7,6 +7,20 @@ import shlex
 
 console = Console()
 
+EXTENSIONS = [
+    "mp4",
+    "mkv",
+    "avi",
+    "mov",
+    "wmv",
+    "flv",
+    "webm",
+    "mp3",
+    "m4a",
+    "aac",
+    "wav",
+]
+
 
 def move_to_path(
     config: MediaConfig, media_type: MediaType, selected_dir: str, selected_file: str
@@ -14,10 +28,7 @@ def move_to_path(
     _, extension = os.path.splitext(selected_file)
     source_path = shlex.quote(os.path.join(config["download_path"], selected_file))
 
-    print("Extension:", extension)
-
-    if not extension:
-        print("No extension found, moving all files in directory")
+    if not extension and extension in EXTENSIONS:
         source_path = shlex.quote(
             os.path.join(config["download_path"], selected_file, "*")
         )
