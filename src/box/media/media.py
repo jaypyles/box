@@ -11,6 +11,13 @@ console = Console()
 def move_to_path(
     config: MediaConfig, media_type: MediaType, selected_dir: str, selected_file: str
 ):
+    _, extension = os.path.splitext(selected_file)
+
+    if not extension:
+        source_path = shlex.quote(
+            os.path.join(config["download_path"], selected_file, "*")
+        )
+
     source_path = shlex.quote(os.path.join(config["download_path"], selected_file))
     destination_path = shlex.quote(
         os.path.join(config[media_type + "_path"], selected_dir)
