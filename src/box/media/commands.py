@@ -9,9 +9,8 @@ def media():
 
 
 @media.command()
-@click.argument("path")
 @click.option(
-    "--type", type=click.Choice(["movie", "tv"]), default="tv", required=False
+    "--media_type", type=click.Choice(["movie", "tv"]), default="tv", required=False
 )
-def move(path: str, media_type: MediaType):
-    move_download_to_media(path, media_type)
+def move(media_type: MediaType):
+    move_download_to_media(media_type)

@@ -8,12 +8,11 @@ console = Console()
 
 
 def move_download_to_media(
-    path: str,
     media_type: MediaType = "tv",
 ):
     config: MediaConfig = load_config("media/jellyfin")
 
-    downloaded_files = os.listdir(path)
+    downloaded_files = os.listdir(config["download_path"])
 
     for idx, file in enumerate(downloaded_files):
         print(f"[cyan][file] {idx + 1} {file} [/cyan]")
@@ -39,9 +38,9 @@ def move_download_to_media(
         )
 
         _ = execute_command(
-            f"mv {path}/{selected_file} {config[media_type + '_path']}/{selected_dir}/{inner_dir}"
+            f"mv {config['download_path']}/{selected_file} {config[media_type + '_path']}/{selected_dir}/{inner_dir}"
         )
     else:
         _ = execute_command(
-            f"mv {path}/{selected_file} {config[media_type + '_path']}/{selected_dir}"
+            f"mv {config['download_path']}/{selected_file} {config[media_type + '_path']}/{selected_dir}"
         )
