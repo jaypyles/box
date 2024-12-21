@@ -26,7 +26,7 @@ def move_to_path(
     config: MediaConfig, media_type: MediaType, selected_dir: str, selected_file: str
 ):
     _, extension = os.path.splitext(selected_file)
-    source_path = shlex.quote(os.path.join(config["download_path"], selected_file))
+    source_path = os.path.join(config["download_path"], selected_file)
 
     print("Source path is: ", source_path)
 
@@ -34,20 +34,22 @@ def move_to_path(
         print("Is a dir.")
 
         for file in os.listdir(os.path.join(config["download_path"], selected_file)):
-            source_path = shlex.quote(os.path.join(source_path, file))
+            file_path = os.path.join(source_path, file)
+            quoted_source_path = shlex.quote(file_path)
             destination_path = shlex.quote(
                 os.path.join(config[media_type + "_path"], selected_dir)
             )
 
-            print(f"Moving {source_path} to {destination_path}")
-            _ = execute_command(f"sudo mv {source_path} {destination_path}")
+            print(f"Moving {quoted_source_path} to {destination_path}")
+            _ = execute_command(f"sudo mv {quoted_source_path} {destination_path}")
     else:
         print("Is a file.")
+        quoted_source_path = shlex.quote(source_path)
         destination_path = shlex.quote(
             os.path.join(config[media_type + "_path"], selected_dir)
         )
-        print(f"Moving {source_path} to {destination_path}")
-        return execute_command(f"sudo mv {source_path} {destination_path}")
+        print(f"Moving {quoted_source_path} to {destination_path}")
+        return execute_command(f"sudo mv {quoted_source_path} {destination_path}")
 
 
 def list_downloaded_files(config: MediaConfig):
