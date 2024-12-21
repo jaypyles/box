@@ -8,13 +8,14 @@ class Shell(Enum):
 
 
 def execute_command(command: str, shell: Shell = Shell.FISH):
-    prefix = f"{shell.value} -c"
-    command = f"{prefix} '{command}'"
-
-    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    result = subprocess.run(
+        [shell.value, "-c", command],
+        capture_output=True,
+        text=True,
+    )
 
     if shell == Shell.FISH:
         if "\n" in result.stdout:
             result.stdout = result.stdout.split("\n", 1)[1]
 
-    return result.stdout, result.stderr
+    return result.stdout.strip(), result.stderr.strip()
