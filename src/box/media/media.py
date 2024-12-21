@@ -16,13 +16,10 @@ def move_to_path(
     source_path = os.path.join(config["download_path"], selected_file)
     destination_path = os.path.join(config[media_type + "_path"], selected_dir)
 
-    quoted_source_path = shlex.quote(source_path)
-    quoted_destination_path = shlex.quote(destination_path)
-
-    print(f"Moving {quoted_source_path} to {quoted_destination_path}")
+    print(f'Moving "{source_path}" to "{destination_path}"')
 
     return execute_command(
-        f"sudo mv {quoted_source_path} {quoted_destination_path}", shell=Shell.BASH
+        rf'sudo mv "{source_path}" "{destination_path}"', shell=Shell.BASH
     )
 
 
