@@ -25,19 +25,22 @@ EXTENSIONS = [
 def move_to_path(
     config: MediaConfig, media_type: MediaType, selected_dir: str, selected_file: str
 ):
-    selected_file_path = os.path.join(config["download_path"], selected_file)
+    source_path = shlex.quote(os.path.join(config["download_path"], selected_file))
 
-    if os.path.isdir(selected_file_path):
-        source_path = os.path.join(selected_file_path, "*")
+    if os.path.isdir(source_path):
+        for file in os.listdir(source_path):
+            source_path = shlex.quote(os.path.join(source_path, file))
+            destination_path = shlex.quote(
+                os.path.join(config[media_type + "_path"], selected_dir)
+            )
+            print(f"Moving {source_path} to {destination_path}")
+            _ = execute_command(f"sudo mv {source_path} {destination_path}")
     else:
-        source_path = selected_file_path
-
-    destination_path = os.path.join(config[media_type + "_path"], selected_dir)
-    source_path = f'"{source_path}"'
-
-    print(f"Moving from {source_path} to {destination_path}")
-
-    return execute_command(f"sudo mv {source_path} {destination_path}")
+        destination_path = shlex.quote(
+            os.path.join(config[media_type + "_path"], selected_dir)
+        )
+        print(f"Moving {source_path} to {destination_path}")
+        return execute_command(f"sudo mv {source_path} {destination_path}")
 
 
 def list_downloaded_files(config: MediaConfig):
