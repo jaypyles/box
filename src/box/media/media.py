@@ -50,7 +50,10 @@ def list_media_folder(config: MediaConfig, media_type: MediaType):
 
         if creating_dir == "y":
             selected_dir = console.input("[cyan]Enter directory name: [/cyan]")
-            os.makedirs(f"{config[media_type + '_path']}/{selected_dir}", exist_ok=True)
+            os.makedirs(
+                shlex.quote(f"{config[media_type + '_path']}/{selected_dir}"),
+                exist_ok=True,
+            )
 
         else:
             return None
@@ -72,7 +75,9 @@ def place_into_media_folder(
     if not inner_dir_idx.isdigit():
         inner_dir = inner_dir_idx
         os.makedirs(
-            f"{config[media_type + '_path']}/{selected_dir}/{inner_dir_idx}",
+            shlex.quote(
+                f"{config[media_type + '_path']}/{selected_dir}/{inner_dir_idx}"
+            ),
             exist_ok=True,
         )
     else:
@@ -94,11 +99,13 @@ def move_download_to_media(
 ):
     config: MediaConfig = load_config("media/jellyfin")
 
-    selected_file = list_downloaded_files(config)
+    selected_file = shlex.quote(list_downloaded_files(config))
     selected_dir = list_media_folder(config, media_type)
 
     if selected_dir is None:
         return
+
+    selected_dir = shlex.quote(selected_dir)
 
     if media_type == "movie":
         out, err = move_to_path(config, media_type, selected_dir, selected_file)
