@@ -5,6 +5,8 @@ from rich import print
 import os
 import shlex
 
+from box.utils.command.utils import Shell
+
 console = Console()
 
 
@@ -74,7 +76,9 @@ def place_into_media_folder(
     )
 
     # Execute command
-    out, err = execute_command(f"sudo mv {source_path} {destination_path}")
+    out, err = execute_command(
+        f"sudo mv {source_path} {destination_path}", shell=Shell.BASH
+    )
     print(out)
     print(err)
 
