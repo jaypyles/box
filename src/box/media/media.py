@@ -3,6 +3,7 @@ from box.media.types import MediaConfig, MediaType
 from rich.console import Console
 from rich import print
 import os
+import shlex
 
 console = Console()
 
@@ -66,12 +67,14 @@ def place_into_media_folder(
 
     print("Inner Dir: ", inner_dir)
 
-    source_path = os.path.join(config['download_path'], selected_file)
-    destination_path = os.path.join(config[media_type + '_path'], selected_dir, inner_dir)
-
-    out, err = execute_command(
-        f"sudo mv '{source_path}' '{destination_path}'"
+    # Escape paths
+    source_path = shlex.quote(os.path.join(config["download_path"], selected_file))
+    destination_path = shlex.quote(
+        os.path.join(config[media_type + "_path"], selected_dir, inner_dir)
     )
+
+    # Execute command
+    out, err = execute_command(f"sudo mv {source_path} {destination_path}")
     print(out)
     print(err)
 
