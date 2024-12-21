@@ -5,25 +5,20 @@ from rich import print
 import os
 import shlex
 
-from box.utils.command.utils import Shell
-
 console = Console()
 
 
 def move_to_path(
     config: MediaConfig, media_type: MediaType, selected_dir: str, selected_file: str
 ):
-    source_path = os.path.join(config["download_path"], selected_file)
-    destination_path = os.path.join(config[media_type + "_path"], selected_dir)
-
-    source_path = shlex.quote(source_path)
-    destination_path = shlex.quote(destination_path)
+    source_path = shlex.quote(os.path.join(config["download_path"], selected_file))
+    destination_path = shlex.quote(
+        os.path.join(config[media_type + "_path"], selected_dir)
+    )
 
     print(f"Moving {source_path} to {destination_path}")
 
-    return execute_command(
-        f"sudo mv {source_path} {destination_path}", shell=Shell.BASH
-    )
+    return execute_command(f"sudo mv {source_path} {destination_path}")
 
 
 def list_downloaded_files(config: MediaConfig):
@@ -105,13 +100,11 @@ def move_download_to_media(
 ):
     config: MediaConfig = load_config("media/jellyfin")
 
-    selected_file = shlex.quote(list_downloaded_files(config))
+    selected_file = list_downloaded_files(config)
     selected_dir = list_media_folder(config, media_type)
 
     if selected_dir is None:
         return
-
-    selected_dir = shlex.quote(selected_dir)
 
     if media_type == "movie":
         out, err = move_to_path(config, media_type, selected_dir, selected_file)
