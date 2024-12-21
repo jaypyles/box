@@ -19,7 +19,7 @@ def move_to_path(
     print(f'Moving "{source_path}" to "{destination_path}"')
 
     return execute_command(
-        rf'sudo mv "{source_path}" "{destination_path}"', shell=Shell.BASH
+        f'sudo mv "{source_path}" "{destination_path}"', shell=Shell.BASH
     )
 
 
@@ -53,7 +53,7 @@ def list_media_folder(config: MediaConfig, media_type: MediaType):
         if creating_dir == "y":
             selected_dir = console.input("[cyan]Enter directory name: [/cyan]")
             os.makedirs(
-                shlex.quote(f"{config[media_type + '_path']}/{selected_dir}"),
+                f"{config[media_type + '_path']}/{selected_dir}",
                 exist_ok=True,
             )
 
@@ -77,9 +77,7 @@ def place_into_media_folder(
     if not inner_dir_idx.isdigit():
         inner_dir = inner_dir_idx
         os.makedirs(
-            shlex.quote(
-                f"{config[media_type + '_path']}/{selected_dir}/{inner_dir_idx}"
-            ),
+            f"{config[media_type + '_path']}/{selected_dir}/{inner_dir_idx}",
             exist_ok=True,
         )
     else:
