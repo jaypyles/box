@@ -14,6 +14,8 @@ def move_to_path(
     _, extension = os.path.splitext(selected_file)
     source_path = shlex.quote(os.path.join(config["download_path"], selected_file))
 
+    print("Extension:", extension)
+
     if not extension:
         print("No extension found, moving all files in directory")
         source_path = shlex.quote(
