@@ -28,15 +28,14 @@ def move_to_path(
     selected_file_path = os.path.join(config["download_path"], selected_file)
 
     if os.path.isdir(selected_file_path):
-        source_path = shlex.quote(os.path.join(selected_file_path, "*"))
+        source_path = os.path.join(selected_file_path, "*")
     else:
-        source_path = shlex.quote(selected_file_path)
+        source_path = selected_file_path
 
-    destination_path = shlex.quote(
-        os.path.join(config[media_type + "_path"], selected_dir)
-    )
+    destination_path = os.path.join(config[media_type + "_path"], selected_dir)
+    source_path = f'"{source_path}"'
 
-    print(f"Moving {source_path} to {destination_path}")
+    print(f"Moving from {source_path} to {destination_path}")
 
     return execute_command(f"sudo mv {source_path} {destination_path}")
 
