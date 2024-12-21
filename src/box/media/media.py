@@ -67,7 +67,7 @@ def place_into_media_folder(
     print("Inner Dir: ", inner_dir)
 
     out, err = execute_command(
-        f"sudo mv {config['download_path']}/{selected_file} {config[media_type + '_path']}/{selected_dir}/{inner_dir}"
+        f"sudo mv '{config['download_path']}/{selected_file}' '{config[media_type + '_path']}/{selected_dir}/{inner_dir}'"
     )
     print(out)
     print(err)
