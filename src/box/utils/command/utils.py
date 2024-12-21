@@ -14,6 +14,7 @@ def execute_command(command: str, shell: Shell = Shell.FISH):
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
 
     if shell == Shell.FISH:
-        result.stdout = result.stdout.split("\n", 1)[1]
+        if "\n" in result.stdout:
+            result.stdout = result.stdout.split("\n", 1)[1]
 
     return result.stdout, result.stderr
