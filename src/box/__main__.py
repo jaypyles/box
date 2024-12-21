@@ -1,4 +1,6 @@
 import click
+
+from box.media import commands as media
 from box.storage import commands as storage
 
 
@@ -13,6 +15,7 @@ def info():
 
 
 cli.add_command(storage.storage)
+cli.add_command(media.media)
 
 
 def main():

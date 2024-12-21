@@ -9,6 +9,6 @@ def storage():
 
 
 @storage.command()
-@click.argument("path")
+@click.argument("path", required=False, default=".")
 def size(path: str):
     get_size(path)

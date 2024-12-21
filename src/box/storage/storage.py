@@ -1,5 +1,12 @@
 import os
 from rich import print
+import stat
+from typing import TypedDict
+
+
+class FileAttributes(TypedDict):
+    size: int
+    permissions: str
 
 
 def determine_closest_size(size_in_bytes: float) -> str:
@@ -36,12 +43,16 @@ def calculate_size(path: str) -> int:
         return 0  # For invalid paths
 
 
+def get_file_permissions(path: str) -> str:
+    return stat.filemode(os.stat(path).st_mode)
+
+
 def get_size(path: str):
     """
     Calculate and display the sizes of top-level files and directories.
     """
     total_size = 0
-    size_map: dict[str, int] = {}
+    size_map: dict[str, FileAttributes] = {}
 
     try:
         top_level_entries = os.listdir(path)
@@ -52,15 +63,21 @@ def get_size(path: str):
 
     for entry in top_level_entries:
         entry_path = os.path.join(path, entry)
+
         try:
             entry_size = calculate_size(entry_path)
-            size_map[entry_path] = entry_size
+            size_map[entry_path] = {
+                "size": entry_size,
+                "permissions": get_file_permissions(entry_path),
+            }
             total_size += entry_size
 
         except (OSError, FileNotFoundError) as e:
             print(f"Error processing entry: {entry_path} ({e})")
 
     for path, size in size_map.items():
-        print(f"[purple]{path}[/purple]: {determine_closest_size(size)}")
+        print(
+            f"[bold purple]{path} [green]{size['permissions']}[/green][/bold purple]: {determine_closest_size(size['size'])}"
+        )
 
     print(f"\n[cyan]Total: {determine_closest_size(total_size)}[/cyan]")

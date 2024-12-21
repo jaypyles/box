@@ -3,10 +3,7 @@ name = "box"
 version = "0.1.0"
 description = "All purpose toolbox."
 authors = [{ name = "Jayden Pyles", email = "jpylesbusiness@gmail.com" }]
-dependencies = [
-    "click>=8.1.7",
-    "rich>=13.9.4",
-]
+dependencies = ["click>=8.1.7", "rich>=13.9.4", "pyaml>=24.12.1"]
 requires-python = "==3.10.*"
 readme = "README.md"
 license = { text = "MIT" }
@@ -17,3 +14,22 @@ distribution = true
 
 [project.scripts]
 box = "box.__main__:main"
+
+[tool.pdm.dev-dependencies]
+dev = ["ipython>=8.26.0"]
+[tool.pyright]
+include = ["./api/backend/"]
+exclude = ["**/node_modules", "**/__pycache__"]
+ignore = []
+defineConstant = { DEBUG = true }
+stubPath = ""
+
+reportMissingImports = true
+reportMissingTypeStubs = false
+reportAny = false
+reportUnknownVariableType = false
+reportUnknownMemberType = false
+reportExplicitAny = false
+
+pythonVersion = "3.10"
+pythonPlatform = "Linux"
