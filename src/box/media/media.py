@@ -28,7 +28,7 @@ def move_to_path(
     _, extension = os.path.splitext(selected_file)
     source_path = shlex.quote(os.path.join(config["download_path"], selected_file))
 
-    if not extension and extension in EXTENSIONS:
+    if extension not in EXTENSIONS:
         source_path = shlex.quote(
             os.path.join(config["download_path"], selected_file, "*")
         )
