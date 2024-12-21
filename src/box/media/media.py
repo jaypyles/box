@@ -33,7 +33,7 @@ def move_to_path(
     if not extension or extension not in EXTENSIONS:
         print("Is a dir.")
 
-        for file in os.listdir(source_path):
+        for file in os.listdir(os.path.join(config["download_path"], selected_file)):
             source_path = shlex.quote(os.path.join(source_path, file))
             destination_path = shlex.quote(
                 os.path.join(config[media_type + "_path"], selected_dir)
