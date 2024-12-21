@@ -64,6 +64,8 @@ def place_into_media_folder(
     else:
         inner_dir = dirs[int(inner_dir_idx) - 1]
 
+    print("Inner Dir: ", inner_dir)
+
     out, err = execute_command(
         f"sudo mv {config['download_path']}/{selected_file} {config[media_type + '_path']}/{selected_dir}/{inner_dir}"
     )
