@@ -16,7 +16,9 @@ def move_to_path(
     source_path = os.path.join(config["download_path"], selected_file)
     destination_path = os.path.join(config[media_type + "_path"], selected_dir)
 
-    _ = execute_command(f"sudo mv {source_path} {destination_path}", shell=Shell.BASH)
+    return execute_command(
+        f"sudo mv {source_path} {destination_path}", shell=Shell.BASH
+    )
 
 
 def list_downloaded_files(config: MediaConfig):
@@ -79,7 +81,12 @@ def place_into_media_folder(
     if inner_dir:
         selected_dir = f"{selected_dir}/{inner_dir}"
 
-    move_to_path(config, media_type, selected_dir, selected_file)
+    out, err = move_to_path(config, media_type, selected_dir, selected_file)
+
+    if err:
+        print(f"[red]{err}[/red]")
+    else:
+        print(f"[green]{out}[/green]")
 
 
 def move_download_to_media(
@@ -94,7 +101,13 @@ def move_download_to_media(
         return
 
     if media_type == "movie":
-        move_to_path(config, media_type, selected_dir, selected_file)
+        out, err = move_to_path(config, media_type, selected_dir, selected_file)
+
+        if err:
+            print(f"[red]{err}[/red]")
+        else:
+            print(f"[green]{out}[/green]")
+
         return
 
     place_into_media_folder(config, media_type, selected_dir, selected_file)
