@@ -28,22 +28,18 @@ def move_to_path(
     _, extension = os.path.splitext(selected_file)
     source_path = os.path.join(config["download_path"], selected_file)
 
-    print("Source path is: ", source_path)
-
     if not extension or extension not in EXTENSIONS:
-        print("Is a dir.")
-
         for file in os.listdir(os.path.join(config["download_path"], selected_file)):
             file_path = os.path.join(source_path, file)
             quoted_source_path = shlex.quote(file_path)
             destination_path = shlex.quote(
                 os.path.join(config[media_type + "_path"], selected_dir)
             )
-
             print(f"Moving {quoted_source_path} to {destination_path}")
             _ = execute_command(f"sudo mv {quoted_source_path} {destination_path}")
+
+        return execute_command(f"sudo rm -rf {source_path}")
     else:
-        print("Is a file.")
         quoted_source_path = shlex.quote(source_path)
         destination_path = shlex.quote(
             os.path.join(config[media_type + "_path"], selected_dir)
