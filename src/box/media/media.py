@@ -53,16 +53,16 @@ def place_into_media_folder(
         print(f"[cyan][{idx + 1}] {dir}[/cyan]")
 
     inner_dir_idx = console.input("[cyan]Enter inner directory name: [/cyan]")
+    inner_dir = None
 
-    try:
+    if not inner_dir_idx.isdigit():
+        inner_dir = inner_dir_idx
+        os.makedirs(
+            f"{config[media_type + '_path']}/{selected_dir}/{inner_dir_idx}",
+            exist_ok=True,
+        )
+    else:
         inner_dir = dirs[int(inner_dir_idx) - 1]
-    except (IndexError, ValueError):
-        inner_dir = console.input("[cyan]Enter inner directory name: [/cyan]")
-
-    os.makedirs(
-        f"{config[media_type + '_path']}/{selected_dir}/{inner_dir}",
-        exist_ok=True,
-    )
 
     _ = execute_command(
         f"mv {config['download_path']}/{selected_file} {config[media_type + '_path']}/{selected_dir}/{inner_dir}"
