@@ -124,6 +124,10 @@ def move_download_to_media():
 
     if media_type == "tv":
         destination_dir = move_episode(config)
+        if destination_dir:
+            _ = execute_command(
+                f"sudo mv {shlex.quote(selected_file)} {shlex.quote(destination_dir)}"
+            )
 
     elif media_type == "movie":
         destination_dir = move_movie(config)
