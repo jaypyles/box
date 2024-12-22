@@ -1,4 +1,5 @@
-from box.utils import load_config, execute_command
+from box.utils import execute_command, fancy_list_files
+from box.media.constants import DOWNLOAD_FILES, MOVIE_FILES, TV_FILES, CONFIG
 from box.media.types import MediaConfig
 from rich.console import Console
 from rich import print
@@ -13,29 +14,20 @@ MEDIA_TYPES = {
 }
 
 
-config: MediaConfig = load_config("media/jellyfin")
-
-
 def get_files(media_type: str):
     if media_type == "tv":
-        for idx, file in enumerate(os.listdir(config["tv_path"])):
-            print(f"[cyan][{idx + 1}] {file}[/cyan]")
+        fancy_list_files(TV_FILES)
     elif media_type == "movie":
-        for idx, file in enumerate(os.listdir(config["movie_path"])):
-            print(f"[cyan][{idx + 1}] {file}[/cyan]")
+        fancy_list_files(MOVIE_FILES)
     elif media_type == "download":
-        for idx, file in enumerate(os.listdir(config["download_path"])):
-            print(f"[cyan][{idx + 1}] {file}[/cyan]")
+        fancy_list_files(DOWNLOAD_FILES)
 
 
 def list_downloaded_files():
-    downloaded_files = os.listdir(config["download_path"])
-
-    for idx, file in enumerate(downloaded_files):
-        print(f"[cyan][{idx + 1}] {file}[/cyan]")
+    fancy_list_files(DOWNLOAD_FILES)
 
     selected_file_idx = console.input("Select file to move: ")
-    selected_file = downloaded_files[int(selected_file_idx) - 1]
+    selected_file = DOWNLOAD_FILES[int(selected_file_idx) - 1]
 
     return selected_file
 
@@ -50,11 +42,7 @@ def determine_type_of_file():
 
 def list_season_folder(media_path: str):
     media_dirs = os.listdir(media_path)
-
-    for idx, dir in enumerate(media_dirs):
-        print(f"[cyan][{idx + 1}] {dir}[/cyan]")
-
-    print(f"Select a season to move the episode to: ")
+    fancy_list_files(media_dirs)
 
     season_idx = console.input("Enter the number of the season: ")
 
@@ -71,18 +59,17 @@ def list_season_folder(media_path: str):
 
 
 def list_show_folder(media_type: str):
-    media_path = config.get(media_type + "_path", "")
+    media_path = CONFIG.get(media_type + "_path", "")
 
     if not media_path or not os.path.isdir(media_path):
         print(f"[red]Error: Invalid path for media type '{media_type}'.[/red]")
         return
 
     media_dirs = os.listdir(media_path)
-
-    for idx, dir in enumerate(media_dirs):
-        print(f"[cyan][{idx + 1}] {dir}[/cyan]")
+    fancy_list_files(media_dirs)
 
     show_idx = console.input("Select a show to move the episode to: ")
+
     try:
         show_dir = media_dirs[int(show_idx) - 1]
     except (IndexError, ValueError):
@@ -106,11 +93,10 @@ def list_movie_folder(config: MediaConfig, media_type: str):
         return
 
     movie_dirs = os.listdir(media_path)
-
-    for idx, dir in enumerate(movie_dirs):
-        print(f"[cyan][{idx + 1}] {dir}[/cyan]")
+    fancy_list_files(movie_dirs)
 
     selected_movie_idx = console.input("Select a movie folder to move to: ")
+
     try:
         selected_movie = movie_dirs[int(selected_movie_idx) - 1]
     except (IndexError, ValueError):
@@ -130,7 +116,7 @@ def move_movie(config: MediaConfig):
 
 def move_download_to_media():
     selected_file = list_downloaded_files()
-    full_selected_file = f"{config['download_path']}/{selected_file}"
+    full_selected_file = f"{CONFIG['download_path']}/{selected_file}"
 
     type_of_file = determine_type_of_file()
     media_type = MEDIA_TYPES[type_of_file]
@@ -149,7 +135,7 @@ def move_download_to_media():
             print(err)
 
     elif media_type == "movie":
-        destination_dir = move_movie(config)
+        destination_dir = move_movie(CONFIG)
         if destination_dir:
             for file in os.listdir(full_selected_file):
                 file_path = f"{full_selected_file}/{file}"
