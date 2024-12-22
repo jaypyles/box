@@ -58,6 +58,7 @@ def list_season_folder(media_path: str):
 
 def list_show_folder(config: MediaConfig, media_type: str):
     media_path = config.get(media_type + "_path", "")
+
     if not media_path or not os.path.isdir(media_path):
         print(f"[red]Error: Invalid path for media type '{media_type}'.[/red]")
         return
@@ -76,7 +77,7 @@ def list_show_folder(config: MediaConfig, media_type: str):
 
     season_dir = list_season_folder(f"{media_path}/{show_dir}")
 
-    return season_dir
+    return f"{media_path}/{show_dir}/{season_dir}"
 
 
 def list_movie_folder(config: MediaConfig, media_type: str):
@@ -98,7 +99,7 @@ def list_movie_folder(config: MediaConfig, media_type: str):
         _ = execute_command(f"mkdir {media_path}/{selected_movie_idx}")
         selected_movie = selected_movie_idx
 
-    return selected_movie
+    return f"{media_path}/{selected_movie}"
 
 
 def move_episode(config: MediaConfig):
@@ -119,15 +120,16 @@ def move_download_to_media():
     media_type = MEDIA_TYPES[type_of_file]
 
     selected_file = list_downloaded_files(config)
+    full_selected_file = f"{config['download_path']}/{selected_file}"
 
     destination_dir = None
 
     if media_type == "tv":
         destination_dir = move_episode(config)
         if destination_dir:
-            print(f"Moving {selected_file} to {destination_dir}")
+            print(f"Moving {full_selected_file} to {destination_dir}")
             out, err = execute_command(
-                f"sudo mv {shlex.quote(selected_file)} {shlex.quote(destination_dir)}"
+                f"sudo mv {shlex.quote(full_selected_file)} {shlex.quote(destination_dir)}"
             )
 
             print(out)
@@ -136,8 +138,8 @@ def move_download_to_media():
     elif media_type == "movie":
         destination_dir = move_movie(config)
         if destination_dir:
-            for file in os.listdir(selected_file):
-                file_path = f"{selected_file}/{file}"
+            for file in os.listdir(full_selected_file):
+                file_path = f"{full_selected_file}/{file}"
                 print(f"Moving {file_path} to {destination_dir}")
                 out, err = execute_command(
                     f"sudo mv {shlex.quote(file_path)} {shlex.quote(destination_dir)}"
