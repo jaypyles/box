@@ -45,7 +45,7 @@ def list_season_folder(media_path: str):
     season_idx = console.input("Enter the number of the season: ")
 
     if not season_idx:
-        return media_path
+        return None
 
     try:
         season_dir = media_dirs[int(season_idx) - 1]
@@ -76,8 +76,12 @@ def list_show_folder(config: MediaConfig, media_type: str):
         show_dir = show_idx
 
     season_dir = list_season_folder(f"{media_path}/{show_dir}")
+    path = f"{media_path}/{show_dir}"
 
-    return f"{media_path}/{show_dir}/{season_dir}"
+    if season_dir:
+        path = f"{path}/{season_dir}"
+
+    return path
 
 
 def list_movie_folder(config: MediaConfig, media_type: str):
@@ -116,11 +120,11 @@ def move_season(config: MediaConfig):
 
 def move_download_to_media():
     config: MediaConfig = load_config("media/jellyfin")
-    type_of_file = determine_type_of_file()
-    media_type = MEDIA_TYPES[type_of_file]
-
     selected_file = list_downloaded_files(config)
     full_selected_file = f"{config['download_path']}/{selected_file}"
+
+    type_of_file = determine_type_of_file()
+    media_type = MEDIA_TYPES[type_of_file]
 
     destination_dir = None
 
