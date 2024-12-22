@@ -161,4 +161,4 @@ def move_download_to_media():
                 print(out)
                 print(err)
 
-            _ = execute_command(f"rm -rf {shlex.quote(full_selected_file)}")
+            _ = execute_command(f"sudo rm -rf {shlex.quote(full_selected_file)}")
