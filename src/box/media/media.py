@@ -7,45 +7,11 @@ import shlex
 
 console = Console()
 
-EXTENSIONS = [
-    "mp4",
-    "mkv",
-    "avi",
-    "mov",
-    "wmv",
-    "flv",
-    "webm",
-    "mp3",
-    "m4a",
-    "aac",
-    "wav",
-]
-
-
-def move_to_path(
-    config: MediaConfig, media_type: MediaType, selected_dir: str, selected_file: str
-):
-    _, extension = os.path.splitext(selected_file)
-    source_path = os.path.join(config["download_path"], selected_file)
-
-    if not extension or extension not in EXTENSIONS:
-        for file in os.listdir(os.path.join(config["download_path"], selected_file)):
-            file_path = os.path.join(source_path, file)
-            quoted_source_path = shlex.quote(file_path)
-            destination_path = shlex.quote(
-                os.path.join(config[media_type + "_path"], selected_dir)
-            )
-            print(f"Moving {quoted_source_path} to {destination_path}")
-            _ = execute_command(f"sudo mv {quoted_source_path} {destination_path}")
-
-        return execute_command(f"sudo rm -rf {source_path}")
-    else:
-        quoted_source_path = shlex.quote(source_path)
-        destination_path = shlex.quote(
-            os.path.join(config[media_type + "_path"], selected_dir)
-        )
-        print(f"Moving {quoted_source_path} to {destination_path}")
-        return execute_command(f"sudo mv {quoted_source_path} {destination_path}")
+MEDIA_TYPES = {
+    "1": "tv",
+    "2": "movie",
+    "3": "tv",
+}
 
 
 def list_downloaded_files(config: MediaConfig):
@@ -60,87 +26,78 @@ def list_downloaded_files(config: MediaConfig):
     return selected_file
 
 
-def list_media_folder(config: MediaConfig, media_type: MediaType):
-    media_dirs = os.listdir(config[media_type + "_path"])
+def determine_type_of_file():
+    type_of_file = console.input(
+        """Is this a:
+        [cyan][1] Episode File[/cyan]
+        [cyan][2] Movie File[/cyan]
+        [cyan][3] Movie Folder[/cyan]
+        [cyan][4] Season Folder[/cyan]
+        [cyan]Enter the number of the type of file: [/cyan]"""
+    )
+
+    return type_of_file
+
+
+def list_inner_media_folder(media_path: str):
+    media_dirs = os.listdir(media_path)
 
     for idx, dir in enumerate(media_dirs):
         print(f"[cyan][{idx + 1}] {dir}[/cyan]")
 
-    selected_dir_idx = console.input("[cyan]Select directory to move file to: [/cyan]")
-    selected_dir = None
+    print(f"Select a season to move the episode to: ")
 
-    try:
-        selected_dir = media_dirs[int(selected_dir_idx) - 1]
-    except (IndexError, ValueError):
-        creating_dir = console.input(
-            "[cyan]Directory does not exist, create it? y/n (y): [/cyan]"
-        )
+    season_idx = console.input("Enter the number of the season: ")
+    season_dir = media_dirs[int(season_idx) - 1]
 
-        if creating_dir == "y":
-            os.makedirs(
-                f"{config[media_type + '_path']}/{selected_dir_idx}",
-                exist_ok=True,
-            )
-
-        else:
-            return None
-
-    if not selected_dir:
-        return selected_dir_idx
-
-    return selected_dir
+    return season_dir
 
 
-def place_into_media_folder(
-    config: MediaConfig, media_type: MediaType, selected_dir: str, selected_file: str
-):
-    dirs = os.listdir(f"{config[media_type + '_path']}/{selected_dir}")
+def list_media_folder(config: MediaConfig, media_type: str):
+    media_path = config.get(media_type + "_path", "")
+    if not media_path or not os.path.isdir(media_path):
+        print(f"[red]Error: Invalid path for media type '{media_type}'.[/red]")
+        return
 
-    for idx, dir in enumerate(dirs):
+    media_dirs = os.listdir(media_path)
+
+    for idx, dir in enumerate(media_dirs):
         print(f"[cyan][{idx + 1}] {dir}[/cyan]")
 
-    inner_dir_idx = console.input("[cyan]Enter inner directory name: [/cyan]")
-    inner_dir = None
+    show_idx = console.input("Select a show to move the episode to: ")
+    try:
+        show_dir = media_dirs[int(show_idx) - 1]
+    except (IndexError, ValueError):
+        _ = execute_command(f"mkdir {media_path}/{show_idx}")
+        show_dir = show_idx
 
-    if not inner_dir_idx.isdigit():
-        inner_dir = inner_dir_idx
-        os.makedirs(
-            f"{config[media_type + '_path']}/{selected_dir}/{inner_dir_idx}",
-            exist_ok=True,
-        )
-    else:
-        inner_dir = dirs[int(inner_dir_idx) - 1]
+    season_dir = list_inner_media_folder(f"{media_path}/{show_dir}")
 
-    if inner_dir:
-        selected_dir = f"{selected_dir}/{inner_dir}"
-
-    out, err = move_to_path(config, media_type, selected_dir, selected_file)
-
-    if err:
-        print(f"[red]{err}[/red]")
-    else:
-        print(f"[green]{out}[/green]")
+    return season_dir
 
 
-def move_download_to_media(
-    media_type: MediaType = "tv",
-):
+def move_episode(config: MediaConfig, selected_file: str):
+    list_media_folder(config, "tv")
+
+
+def move_movie(config: MediaConfig, selected_file: str):
+    list_media_folder(config, "movie")
+
+
+def move_season(config: MediaConfig, selected_file: str):
+    list_media_folder(config, "tv")
+
+
+def move_download_to_media():
     config: MediaConfig = load_config("media/jellyfin")
+    type_of_file = determine_type_of_file()
+    media_type = MEDIA_TYPES[type_of_file]
 
     selected_file = list_downloaded_files(config)
-    selected_dir = list_media_folder(config, media_type)
 
-    if selected_dir is None:
-        return
-
-    if media_type == "movie":
-        out, err = move_to_path(config, media_type, selected_dir, selected_file)
-
-        if err:
-            print(f"[red]{err}[/red]")
-        else:
-            print(f"[green]{out}[/green]")
-
-        return
-
-    place_into_media_folder(config, media_type, selected_dir, selected_file)
+    if media_type == "tv":
+        move_episode(config, selected_file)
+    elif media_type == "movie":
+        move_movie(config, selected_file)
+    elif media_type == "season":
+        move_season(config, selected_file)
