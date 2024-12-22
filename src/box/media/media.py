@@ -1,5 +1,5 @@
 from box.utils import load_config, execute_command
-from box.media.types import MediaConfig, MediaType
+from box.media.types import MediaConfig
 from rich.console import Console
 from rich import print
 import os
@@ -10,11 +10,25 @@ console = Console()
 MEDIA_TYPES = {
     "1": "tv",
     "2": "movie",
-    "3": "tv",
 }
 
 
-def list_downloaded_files(config: MediaConfig):
+config: MediaConfig = load_config("media/jellyfin")
+
+
+def get_files(media_type: str):
+    if media_type == "tv":
+        for idx, file in enumerate(os.listdir(config["tv_path"])):
+            print(f"[cyan][{idx + 1}] {file}[/cyan]")
+    elif media_type == "movie":
+        for idx, file in enumerate(os.listdir(config["movie_path"])):
+            print(f"[cyan][{idx + 1}] {file}[/cyan]")
+    elif media_type == "download":
+        for idx, file in enumerate(os.listdir(config["download_path"])):
+            print(f"[cyan][{idx + 1}] {file}[/cyan]")
+
+
+def list_downloaded_files():
     downloaded_files = os.listdir(config["download_path"])
 
     for idx, file in enumerate(downloaded_files):
@@ -28,7 +42,7 @@ def list_downloaded_files(config: MediaConfig):
 
 def determine_type_of_file():
     type_of_file = console.input(
-        """Is this a:\n[cyan][1] Episode File[/cyan]\n[cyan][2] Movie File[/cyan]\n[cyan][3] Movie Folder[/cyan]\n[cyan][4] Season Folder[/cyan]\n[cyan]Enter the number of the type of file: [/cyan]"""
+        """Is this a:\n[cyan][1] Episode/Season[/cyan]\n[cyan][2] Movie[/cyan]\n[cyan]Enter the number of the type of file: [/cyan]"""
     )
 
     return type_of_file
@@ -56,7 +70,7 @@ def list_season_folder(media_path: str):
     return season_dir
 
 
-def list_show_folder(config: MediaConfig, media_type: str):
+def list_show_folder(media_type: str):
     media_path = config.get(media_type + "_path", "")
 
     if not media_path or not os.path.isdir(media_path):
@@ -106,21 +120,16 @@ def list_movie_folder(config: MediaConfig, media_type: str):
     return f"{media_path}/{selected_movie}"
 
 
-def move_episode(config: MediaConfig):
-    return list_show_folder(config, "tv")
+def move_episode():
+    return list_show_folder("tv")
 
 
 def move_movie(config: MediaConfig):
     return list_movie_folder(config, "movie")
 
 
-def move_season(config: MediaConfig):
-    return list_show_folder(config, "tv")
-
-
 def move_download_to_media():
-    config: MediaConfig = load_config("media/jellyfin")
-    selected_file = list_downloaded_files(config)
+    selected_file = list_downloaded_files()
     full_selected_file = f"{config['download_path']}/{selected_file}"
 
     type_of_file = determine_type_of_file()
@@ -129,7 +138,7 @@ def move_download_to_media():
     destination_dir = None
 
     if media_type == "tv":
-        destination_dir = move_episode(config)
+        destination_dir = move_episode()
         if destination_dir:
             print(f"Moving {full_selected_file} to {destination_dir}")
             out, err = execute_command(
@@ -151,8 +160,3 @@ def move_download_to_media():
 
                 print(out)
                 print(err)
-
-    elif media_type == "season":
-        destination_dir = move_season(config)
-
-    # execute_command(f"mv {selected_file} {destination_dir}")
