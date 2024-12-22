@@ -125,18 +125,26 @@ def move_download_to_media():
     if media_type == "tv":
         destination_dir = move_episode(config)
         if destination_dir:
-            _ = execute_command(
+            print(f"Moving {selected_file} to {destination_dir}")
+            out, err = execute_command(
                 f"sudo mv {shlex.quote(selected_file)} {shlex.quote(destination_dir)}"
             )
+
+            print(out)
+            print(err)
 
     elif media_type == "movie":
         destination_dir = move_movie(config)
         if destination_dir:
             for file in os.listdir(selected_file):
                 file_path = f"{selected_file}/{file}"
-                _ = execute_command(
+                print(f"Moving {file_path} to {destination_dir}")
+                out, err = execute_command(
                     f"sudo mv {shlex.quote(file_path)} {shlex.quote(destination_dir)}"
                 )
+
+                print(out)
+                print(err)
 
     elif media_type == "season":
         destination_dir = move_season(config)
