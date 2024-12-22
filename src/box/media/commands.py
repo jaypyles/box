@@ -13,6 +13,11 @@ def move():
 
 
 @media.command()
-@click.argument("media_type", choices=["tv", "movie", "download"])
+@click.option(
+    "--media-type",
+    type=click.Choice(["tv", "movie", "download"]),
+    required=True,
+    help="Type of media to list.",
+)
 def list(media_type: str):
     get_files(media_type)
