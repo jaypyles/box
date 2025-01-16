@@ -22,7 +22,6 @@ try:
     tv_files = os.listdir(TV_PATH)
 except Exception as e:
     print(f"[red]Error: {e}[/red]")
-    exit(1)
 
 DOWNLOAD_FILES: list[str] = download_files
 MOVIE_FILES: list[str] = movie_files
